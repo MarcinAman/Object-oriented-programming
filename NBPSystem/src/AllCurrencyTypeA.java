@@ -59,6 +59,13 @@ public class AllCurrencyTypeA implements ICurrency {
         return sb.toString();
     }
 
+    public Double getFirstValue(){
+        for(CurrencyObject i : currencyData){
+            return i.getValueAsk();
+        }
+        return null;
+    }
+
     public CurrencyObject getMaxCurrencyObject(){
         CurrencyObject maxValue = null;
         for(CurrencyObject i : currencyData){

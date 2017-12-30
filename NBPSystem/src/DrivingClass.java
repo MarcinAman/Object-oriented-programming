@@ -11,6 +11,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,9 +19,11 @@ public class DrivingClass {
     String input;
     String apiResponse;
     private static int valueLength = 20;
+    SimpleDateFormat format;
 
     public DrivingClass (String input){
         this.input = input;
+        format = new SimpleDateFormat("yyyy-MM-dd");
     }
 
     //Common part:
@@ -194,6 +197,47 @@ public class DrivingClass {
         return "Max amplitude has currency: " + maxCurrency.getFullName() + " with: " + maxValue;
     }
 
+    public Calendar parseDateString(String date) throws ParseException {
+        Calendar dateParsed = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        dateParsed.setTime(format.parse(date));
+        return dateParsed;
+    }
+
+    public String makeBarChart(Double value, Double div,Character baseChar){
+        Double times = value;
+        if(div!=0) times = value/div;
+        return String.join("", Collections.nCopies(times.intValue(),baseChar.toString()));
+    }
+
+    public String drawWeeklyChart(String dateSince, String dateTo, String currency,Character baseChar) throws ParseException, JSONException {
+        //Jaki jest dokladnie input?
+        String monthDateSince = dateSince.substring(0,dateSince.lastIndexOf("-"))+"-01";
+        int weekNumberSince = Integer.parseInt(dateSince.substring(dateSince.lastIndexOf("-")+1,dateSince.length()));
+        String monthDateTo = dateTo.substring(0,dateTo.lastIndexOf("-"))+"-01";
+        int weekNumberTo = Integer.parseInt(dateTo.substring(dateTo.lastIndexOf("-")+1,dateTo.length()));
+        Calendar dateSinceParsed = parseDateString(monthDateSince);
+        dateSinceParsed.set(Calendar.WEEK_OF_MONTH,weekNumberSince);
+        Calendar dateToParsed = parseDateString(monthDateTo);
+        dateToParsed.set(Calendar.WEEK_OF_MONTH,weekNumberTo);
+        while(dateSinceParsed.get(Calendar.DAY_OF_WEEK)!=2) dateSinceParsed.add(Calendar.DATE,1);
+        StringBuilder sb = new StringBuilder();
+        for(Calendar j = dateSinceParsed;j.get(Calendar.DAY_OF_WEEK)!=7;j.add(Calendar.DATE,1)){
+            Calendar i = Calendar.getInstance();
+            for(i.set(j.get(Calendar.YEAR),j.get(Calendar.MONTH),j.get(Calendar.DAY_OF_MONTH));i.before(dateToParsed);i.add(Calendar.DATE,7)) {
+                ICurrency icurrency = null;
+                try {
+                    icurrency = loadCurrencyData(format.format(i.getTime()),"A/"+currency,"rates");
+                    AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) icurrency;
+                    sb.append(i.get(Calendar.DAY_OF_WEEK) +". "+makeBarChart(currencyTypeA.getFirstValue(),0.1,baseChar)+"\n");
+                } catch (IOException e) {
+                    sb.append(i.get(Calendar.DAY_OF_WEEK)+". No data \n");
+                }
+            }
+        }
+        return sb.toString();
+    }
+
     //Gold Part:
 
     public Gold loadDayGoldData(String day) throws IOException, JSONException {
@@ -225,7 +269,7 @@ public class DrivingClass {
             while(!dateSinceParsed.equals(dateToParsed)){
                 Calendar dateSinceAdded = Calendar.getInstance();
                 dateSinceAdded.setTime(dateSinceParsed.getTime());
-                dateSinceAdded.add(Calendar.DATE,30);
+                dateSinceAdded.add(Calendar.DATE,50);
                 if(dateSinceAdded.after(dateToParsed) || dateSinceAdded.equals(dateToParsed)){
                     Gold gold = loadDayGoldData(format.format(dateSinceParsed.getTime())+"/"+dateTo);
                     sum = sum.add(gold.getSumFromPeriod());
