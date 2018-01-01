@@ -1,7 +1,7 @@
-# Object-oriented-programming \n
+# Object-oriented-programming 
 
-Adnotations to NBP System project: \n
-#TODO:\n
--exception handling \n
--better way to pass additional parameters to loading method \n
--docs \n
+Adnotations to NBP System project: <br /> 
+#TODO: <br /> 
+-exception handling <br /> 
+-better way to pass additional parameters to loading method <br /> 
+-docs <br /> 
