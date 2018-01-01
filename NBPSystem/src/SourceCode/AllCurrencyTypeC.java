@@ -7,8 +7,8 @@ import org.json.JSONObject;
 import java.util.HashSet;
 
 public class AllCurrencyTypeC implements ICurrency {
-    HashSet<CurrencyObject> currencyData;
-    String date;
+    public HashSet<CurrencyObject> currencyData;
+    public String date;
 
     public AllCurrencyTypeC(String date) {
         this.currencyData = new HashSet<>();
@@ -56,26 +56,6 @@ public class AllCurrencyTypeC implements ICurrency {
         }
         currencyData.remove(maxDiff);
         return maxDiff;
-    }
-
-    public CurrencyObject getMinAskValue(){
-        CurrencyObject minValue = null;
-        for(CurrencyObject i : currencyData){
-            if(minValue == null || minValue.getValueAsk() > i.getValueAsk()){
-                minValue = i;
-            }
-        }
-        return minValue;
-    }
-
-    public CurrencyObject getMaxAskValue(){
-        CurrencyObject maxValue = null;
-        for(CurrencyObject i : currencyData){
-            if(maxValue == null || maxValue.getValueAsk() < i.getValueAsk()){
-                maxValue = i;
-            }
-        }
-        return maxValue;
     }
 
 }

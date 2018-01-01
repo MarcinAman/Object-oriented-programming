@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DrivingClass {
-    String apiResponse;
+    //String apiResponse;
     private static int valueLength = 20;
-    SimpleDateFormat format;
+    public SimpleDateFormat format;
 
     public DrivingClass (){
         format = new SimpleDateFormat("yyyy-MM-dd");
@@ -42,21 +42,21 @@ public class DrivingClass {
 
     //Currency part:
 
-    public ICurrency loadCurrencyData(String day,String table,String column) throws IOException, JSONException {
+    public ICurrency loadCurrencyData(String nameAndDate,String table,String column) throws IOException, JSONException {
         ICurrency currency = null;
         if(table.equals("A")||table.startsWith("A")){
-            currency =  new AllCurrencyTypeA(day);
+            currency =  new AllCurrencyTypeA(nameAndDate);
         }
         else{
-            currency =  new AllCurrencyTypeC(day);
+            currency =  new AllCurrencyTypeC(nameAndDate);
         }
-        this.apiResponse = getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+day+"/?format=json");
-        currency.getAllCurrency(this.apiResponse);
+//        this.apiResponse = getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+day+"/?format=json");
+        currency.getAllCurrency(getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+nameAndDate+"/?format=json"));
         return currency;
     }
 
     public String gatherDayCurrencyDataTableA(String currencyName,String day) throws IOException, JSONException {
-        ICurrency object = loadCurrencyData(currencyName,"A","rates");
+        ICurrency object = loadCurrencyData(currencyName+"/"+day,"A","rates");
         AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) object;
         return "Currency value: " + currencyTypeA.toString();
     }
@@ -99,11 +99,8 @@ public class DrivingClass {
     //https://stackoverflow.com/questions/2186931/java-pass-method-as-parameter
 
     public String getMaxMinOfCurrency(String currency, String dateSince, String dateTo) throws ParseException, IOException, JSONException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar dateSinceParsed = Calendar.getInstance();
-        Calendar dateToParsed = Calendar.getInstance();
-        dateSinceParsed.setTime(format.parse(dateSince));
-        dateToParsed.setTime(format.parse(dateTo));
+        Calendar dateSinceParsed = parseDateString(dateSince);
+        Calendar dateToParsed = parseDateString(dateTo);
         boolean flag = true;
         AllCurrencyTypeA currencyTypeA;
         CurrencyObject minValue = null, maxValue=null;
@@ -145,11 +142,8 @@ public class DrivingClass {
         //Jesli jest to do value dodajemy abs roznicy pomiedzy ValueAsk z klucz a aktualna.
 
         HashMap<CurrencyObject,Double>amplitudes = new HashMap<>();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar dateSinceParsed = Calendar.getInstance();
-        Calendar dateToParsed = Calendar.getInstance();
-        dateSinceParsed.setTime(format.parse(dateSince));
-        dateToParsed.setTime(format.parse(dateTo));
+        Calendar dateSinceParsed = parseDateString(dateSince);
+        Calendar dateToParsed = parseDateString(dateTo);
         boolean flag = true;
         while(!dateSinceParsed.equals(dateToParsed) && flag){
             AllCurrencyTypeA currencyTypeA = null;
@@ -242,8 +236,8 @@ public class DrivingClass {
 
     public Gold loadDayGoldData(String day) throws IOException, JSONException {
         Gold gold = new Gold(day);
-        this.apiResponse = getAllData("http://api.nbp.pl/api/cenyzlota/"+day+"/?format=json");
-        gold.loadGoldRates(this.apiResponse);
+//        this.apiResponse = getAllData("http://api.nbp.pl/api/cenyzlota/"+day+"/?format=json");
+        gold.loadGoldRates(getAllData("http://api.nbp.pl/api/cenyzlota/"+day+"/?format=json"));
         return gold;
     }
 
@@ -260,11 +254,8 @@ public class DrivingClass {
         else{
             BigDecimal sum = new BigDecimal(0,new MathContext(2));
             BigDecimal days = new BigDecimal(0);
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar dateSinceParsed = Calendar.getInstance();
-            Calendar dateToParsed = Calendar.getInstance();
-            dateSinceParsed.setTime(format.parse(dateSince));
-            dateToParsed.setTime(format.parse(dateTo));
+            Calendar dateSinceParsed = parseDateString(dateSince);
+            Calendar dateToParsed = parseDateString(dateTo);
 
             while(!dateSinceParsed.equals(dateToParsed)){
                 Calendar dateSinceAdded = Calendar.getInstance();

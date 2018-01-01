@@ -61,6 +61,12 @@ public class AllCurrencyTypeA implements ICurrency {
         return sb.toString();
     }
 
+
+    /*
+    This method is used only when a currencyData hashset has 1 value since
+    there is no way to tell which element will be returned
+     */
+
     public Double getFirstValue(){
         for(CurrencyObject i : currencyData){
             return i.getValueAsk();
