@@ -38,7 +38,7 @@ public class ChartManager extends Application{
         stage.setTitle("Bar Chart");
         NumberAxis xAxis = new NumberAxis();
         CategoryAxis yAxis = new CategoryAxis();
-        BarChart<Number,String> bc = new BarChart<>(xAxis,yAxis);
+        BarChart<Number,String> bc = new BarChart<>(xAxis,yAxis); //~!!!!!!
         bc.setTitle("Currency cost summary");
         xAxis.setLabel("Value");
         xAxis.setTickLabelRotation(90);
