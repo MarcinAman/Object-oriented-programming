@@ -1,10 +1,19 @@
 package SourceCode;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.stage.Stage;
 import org.json.JSONException;
 
 import java.io.IOException;
 
-public class MainNBPClass {
+
+public class MainNBPClass{
+
 
     public static void displayHelp(){
         System.out.println("Help: \n" +
@@ -53,16 +62,19 @@ public class MainNBPClass {
 //                    displayHelp();
 //                }
 //            }
-//            System.out.println(drivingClass.gatherDayCurrencyDataTableA("GBP","2015-12-15"));
+            System.out.println(drivingClass.gatherDayCurrencyDataTableA("GBP","2015-12-15"));
 //            System.out.println(drivingClass.gatherDayCurrencyDataTableA("USD","2016-05-04"));
 //            System.out.println(drivingClass.gatherDayCurrencyDataTableA("USD","2017-04-04"));
 //            System.out.println(drivingClass.gatherGoldData("2017-12-15"));
-            System.out.println(drivingClass.gatherAverageGoldPrice("2017-11-15","2017-11-20"));
+//            System.out.println(drivingClass.gatherAverageGoldPrice("2017-11-15","2017-11-20"));
 //            System.out.println(drivingClass.getMinAskCurrency("2017-11-21"));
 //            System.out.println(drivingClass.getMaxDiffrenceCurrencies("2017-12-21",10));
 //            System.out.println(drivingClass.getMaxMinOfCurrency("GBP","2013-12-15","2017-11-20"));
 //            System.out.println(drivingClass.getMaxAplitudeCurrency("2013-01-21","2017-12-23"));
-//            System.out.print(drivingClass.drawWeeklyChart("2017-10-1","2017-12-3","usd",'+'));
+//              System.out.println(drivingClass.drawWeeklyChart("2017-10-1","2017-12-3","usd","+"));
+           drivingClass.drawFXChart("2017-10-1","2017-12-3","usd");
+
+            //"\u25A1"
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -75,3 +87,5 @@ public class MainNBPClass {
 
 //http://www.jfree.org/jfreechart/download.html
 //https://stackoverflow.com/questions/16714738/xy-plotting-with-java
+//Testy automatyczne
+//Java FX

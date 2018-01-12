@@ -54,6 +54,14 @@ public class CurrencyObject {
         return valueSell;
     }
 
+    public String getDate(){
+        return this.date;
+    }
+
+    public double getGenericValueAsk(){
+        return valueSell.doubleValue();
+    }
+
     public void setValueSell(Double value) {
         this.valueSell = value;
     }

@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DrivingClass {
+public class DrivingClass{
     //String apiResponse;
     private static int valueLength = 20;
     public SimpleDateFormat format;
@@ -37,32 +37,38 @@ public class DrivingClass {
             api.append(inputString);
         }
         input.close();
+        if(api.toString().startsWith("404")) throw new IOException("Data not found");
         return api.toString();
     }
 
     //Currency part:
 
-    public ICurrency loadCurrencyData(String nameAndDate,String table,String column) throws IOException, JSONException {
+    public ICurrency loadCurrencyData(String name, String date,String table,String column) throws IOException, JSONException {
         ICurrency currency = null;
         if(table.equals("A")||table.startsWith("A")){
-            currency =  new AllCurrencyTypeA(nameAndDate);
+            currency =  new AllCurrencyTypeA(date);
         }
         else{
-            currency =  new AllCurrencyTypeC(nameAndDate);
+            currency =  new AllCurrencyTypeC(date);
         }
-//        this.apiResponse = getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+day+"/?format=json");
-        currency.getAllCurrency(getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+nameAndDate+"/?format=json"));
+        if(name==null){
+            currency.getAllCurrency(getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+date+"/?format=json"));
+        }
+        else{
+            currency.getAllCurrency(getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+name+"/"+date+"/?format=json"));
+
+        }
         return currency;
     }
 
     public String gatherDayCurrencyDataTableA(String currencyName,String day) throws IOException, JSONException {
-        ICurrency object = loadCurrencyData(currencyName+"/"+day,"A","rates");
+        ICurrency object = loadCurrencyData(currencyName,day,"A","rates");
         AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) object;
         return "Currency value: " + currencyTypeA.toString();
     }
 
     public ICurrency loadDayCurrencyDataTableC(String day) throws IOException, JSONException {
-        ICurrency currency = loadCurrencyData(day,"C","tables");
+        ICurrency currency = loadCurrencyData(null,day,"C","tables");
         return currency;
     }
 
@@ -109,13 +115,13 @@ public class DrivingClass {
             dateSinceAdded.setTime(dateSinceParsed.getTime());
             dateSinceAdded.add(Calendar.DATE,180);
             if(dateSinceAdded.after(dateToParsed)||dateSinceAdded.equals(dateToParsed)){
-                ICurrency iCurrency = loadCurrencyData(format.format(dateSinceParsed.getTime())+"/"+dateTo,
+                ICurrency iCurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+"/"+dateTo,
                         "A/"+currency,"rates");
                 currencyTypeA = (AllCurrencyTypeA) iCurrency;
                 flag = false;
             }
             else{
-                ICurrency iCurrency = loadCurrencyData(format.format(dateSinceParsed.getTime())+"/"+
+                ICurrency iCurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+"/"+
                         format.format(dateSinceAdded.getTime()),
                         "A/"+currency,"rates");
                 currencyTypeA = (AllCurrencyTypeA) iCurrency;
@@ -151,13 +157,13 @@ public class DrivingClass {
             dateSinceAdded.setTime(dateSinceParsed.getTime());
             dateSinceAdded.add(Calendar.DATE,90);
             if(dateSinceAdded.after(dateToParsed) || dateSinceAdded.equals(dateToParsed)){
-                ICurrency icurrency = loadCurrencyData(format.format(dateSinceParsed.getTime())+
+                ICurrency icurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+
                         "/"+dateTo,"A","tables");
                 currencyTypeA = (AllCurrencyTypeA) icurrency;
                 flag = false;
             }
             else{
-                ICurrency icurrency = loadCurrencyData(format.format(dateSinceParsed.getTime())+
+                ICurrency icurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+
                         "/"+format.format(dateSinceAdded.getTime()),"A","tables");
                 currencyTypeA = (AllCurrencyTypeA) icurrency;
                 dateSinceParsed = dateSinceAdded;
@@ -198,13 +204,13 @@ public class DrivingClass {
         return dateParsed;
     }
 
-    public String makeBarChart(Double value, Double div,Character baseChar){
+    public String makeBarChart(Double value, Double div,String baseChar){
         Double times = value;
         if(div!=0) times = value/div;
-        return String.join("", Collections.nCopies(times.intValue(),baseChar.toString()));
+        return String.join("", Collections.nCopies(times.intValue(),baseChar))+" "+value;
     }
 
-    public String drawWeeklyChart(String dateSince, String dateTo, String currency,Character baseChar) throws ParseException, JSONException {
+    public String drawWeeklyChart(String dateSince, String dateTo, String currency,String baseChar) throws ParseException, JSONException {
         //Jaki jest dokladnie input?
         String monthDateSince = dateSince.substring(0,dateSince.lastIndexOf("-"))+"-01";
         int weekNumberSince = Integer.parseInt(dateSince.substring(dateSince.lastIndexOf("-")+1,dateSince.length()));
@@ -221,7 +227,7 @@ public class DrivingClass {
             for(i.set(j.get(Calendar.YEAR),j.get(Calendar.MONTH),j.get(Calendar.DAY_OF_MONTH));i.before(dateToParsed);i.add(Calendar.DATE,7)) {
                 ICurrency icurrency = null;
                 try {
-                    icurrency = loadCurrencyData(format.format(i.getTime()),"A/"+currency,"rates");
+                    icurrency = loadCurrencyData(null,format.format(i.getTime()),"A/"+currency,"rates");
                     AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) icurrency;
                     sb.append(i.get(Calendar.DAY_OF_WEEK) +". "+makeBarChart(currencyTypeA.getFirstValue(),0.1,baseChar)+"\n");
                 } catch (IOException e) {
@@ -232,11 +238,19 @@ public class DrivingClass {
         return sb.toString();
     }
 
+    public void drawFXChart(String dateSince, String dateTo, String currency){
+        ChartManager cm = new ChartManager();
+        cm.setData(dateSince,dateTo,currency);
+        cm.getChart();
+    }
+
+
+
+
     //SourceCode.Gold Part:
 
     public Gold loadDayGoldData(String day) throws IOException, JSONException {
         Gold gold = new Gold(day);
-//        this.apiResponse = getAllData("http://api.nbp.pl/api/cenyzlota/"+day+"/?format=json");
         gold.loadGoldRates(getAllData("http://api.nbp.pl/api/cenyzlota/"+day+"/?format=json"));
         return gold;
     }
