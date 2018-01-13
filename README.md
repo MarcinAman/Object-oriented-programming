@@ -2,6 +2,5 @@
 
 Adnotations to NBP System project: <br /> 
 #TODO: <br /> 
--exception handling <br /> 
--better way to pass additional parameters to loading method <br /> 
--docs <br /> 
+Searching for bugs ;) <br />
+Some smaller additions like spelling mistakes and cleaning code from unnecessary variables
