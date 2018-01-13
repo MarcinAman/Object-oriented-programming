@@ -1,5 +1,8 @@
 package SourceCode;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
@@ -17,16 +20,29 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DrivingClass{
+public class DrivingClass extends Application{
     //String apiResponse;
     private static int valueLength = 20;
     public SimpleDateFormat format;
+    private static int workingDays = 7;
 
     public DrivingClass (){
         format = new SimpleDateFormat("yyyy-MM-dd");
     }
 
+
     //Common part:
+
+    /**
+     * Method is responsible for sending requests to a api server.
+     * String value of the api response is being returned
+     * after that connection to a server is closed
+     *
+     * @param URLs url connection
+     * @return String value of api response
+     * @throws IOException Thrown if server response is "404"
+     */
+
     public String getAllData(String URLs) throws IOException {
         URL url = new URL(URLs);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -43,6 +59,17 @@ public class DrivingClass{
 
     //Currency part:
 
+    /**
+     * Method loading a string parameters info an URL-String form and then parse it into objects
+     * Possible return objects are: AllCurrencyTypeA or AllCurrencyTypeC as they implement ICurrency interface
+     * @param name Name of currency that we search for
+     * @param date Date or a time period in format date1/date2 or just date1
+     * @param table Table to search. Can be either A or C
+     * @param column In which we search. To exacly know which you want see certain api return methods
+     * @return ICurrency Object with data
+     * @throws IOException Thrown if server returns 404
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
     public ICurrency loadCurrencyData(String name, String date,String table,String column) throws IOException, JSONException {
         ICurrency currency = null;
         if(table.equals("A")||table.startsWith("A")){
@@ -61,6 +88,17 @@ public class DrivingClass{
         return currency;
     }
 
+    /**
+     * Pass-through method to make your life easier. You don't need to remember the table or column.
+     * Those values are set by default to A and rates
+     *
+     * @param currencyName Name of the currency that you want to search. The short one (3 characters long)
+     * @param day Date in format YYYY-MM-DD
+     * @return Price of a certain currency in given period
+     * @throws IOException Thrown if server returns 404
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
+
     public String gatherDayCurrencyDataTableA(String currencyName,String day) throws IOException, JSONException {
         ICurrency object = loadCurrencyData(currencyName,day,"A","rates");
         AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) object;
@@ -72,6 +110,13 @@ public class DrivingClass{
         return currency;
     }
 
+    /**
+     * Method returns an information about currency with a minimal price in certain date
+     * @param day String value of date in format YYYY-MM-DD
+     * @return String with minimal currency value and symbol
+     * @throws IOException Thrown if server returns 404
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
     public String getMinAskCurrency(String day) throws IOException, JSONException {
         ICurrency object = loadDayCurrencyDataTableC(day);
         AllCurrencyTypeC currencyTypeC = (AllCurrencyTypeC) object;
@@ -79,6 +124,14 @@ public class DrivingClass{
         return "Minimal ask currency object is: " + result.toString();
     }
 
+    /**
+     * Method returns information about currencies with max difference in price between ask and bid values
+     * @param day Day to gather data in format YYYY-MM-DD
+     * @param amount Amount of records that you want to have sorted in reverse order. If there is not enough all of them will be returned
+     * @return String containing information about currencies with max diffrence in price
+     * @throws IOException Thrown if server returns 404
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
     public String getMaxDiffrenceCurrencies(String day, int amount) throws IOException, JSONException {
         ICurrency iCurrency = loadDayCurrencyDataTableC(day);
         AllCurrencyTypeC object = (AllCurrencyTypeC)iCurrency;
@@ -104,6 +157,17 @@ public class DrivingClass{
 
     //https://stackoverflow.com/questions/2186931/java-pass-method-as-parameter
 
+    /**
+     * Method gathers information about max and min price of a certain currency in given period
+     * From a programming point of view this period can be infinitely long but NBP Api only has data since 2nd of january 2002
+     * @param currency Short (3 characters long) currency symbol
+     * @param dateSince Date since you want to have information in format YYYY-MM-DD
+     * @param dateTo Date to you want to have information in format YYYY-MM-DD
+     * @return String containing information about max-es and min-s of a certain currency
+     * @throws ParseException Thrown if a date is different format that YYYY-MM-DD
+     * @throws IOException Thrown if server returns 404
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
     public String getMaxMinOfCurrency(String currency, String dateSince, String dateTo) throws ParseException, IOException, JSONException {
         Calendar dateSinceParsed = parseDateString(dateSince);
         Calendar dateToParsed = parseDateString(dateTo);
@@ -142,6 +206,16 @@ public class DrivingClass{
                 "Max value: " +maxValue.toStringWithDate();
     }
 
+    /**
+     * Method returns a String with name of a currency that had max aplitude in specific time period.
+     *
+     * @param dateSince Date since you want to have information in format YYYY-MM-DD
+     * @param dateTo Date to you want to have information in format YYYY-MM-DD
+     * @return String with currency name
+     * @throws ParseException Thrown if a date is different format that YYYY-MM-DD
+     * @throws IOException Thrown if server returns 404
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
     public String getMaxAplitudeCurrency(String dateSince, String dateTo) throws ParseException, IOException, JSONException {
         //Wczytujemy okresami
         //Jesli nie ma w hashmapie to dodajemy
@@ -210,40 +284,102 @@ public class DrivingClass{
         return String.join("", Collections.nCopies(times.intValue(),baseChar))+" "+value;
     }
 
+    /**
+     * Method draws a graph in terminal representing weekly data about currency.
+     * Graph is in format:
+     * mondays-tuesedays etc so you can easily compare values between certain weeks
+     *
+     * @param dateSince Date since you want to have information in format YYYY-MM-DD
+     * @param dateTo Date to you want to have information in format YYYY-MM-DD
+     * @param currency Short (3 characters long) currency symbol
+     * @param baseChar Char to produce a graph with. I highly suggest using sthing nice like + or "\u25A1" which is square as it will be easier to read.
+     * @return String with graph
+     * @throws ParseException Thrown if a date is different format that YYYY-MM-DD
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
     public String drawWeeklyChart(String dateSince, String dateTo, String currency,String baseChar) throws ParseException, JSONException {
-        //Jaki jest dokladnie input?
+
         String monthDateSince = dateSince.substring(0,dateSince.lastIndexOf("-"))+"-01";
         int weekNumberSince = Integer.parseInt(dateSince.substring(dateSince.lastIndexOf("-")+1,dateSince.length()));
         String monthDateTo = dateTo.substring(0,dateTo.lastIndexOf("-"))+"-01";
         int weekNumberTo = Integer.parseInt(dateTo.substring(dateTo.lastIndexOf("-")+1,dateTo.length()));
         Calendar dateSinceParsed = parseDateString(monthDateSince);
-        dateSinceParsed.set(Calendar.WEEK_OF_MONTH,weekNumberSince);
+        dateSinceParsed.set(Calendar.WEEK_OF_MONTH,weekNumberSince-1);
         Calendar dateToParsed = parseDateString(monthDateTo);
         dateToParsed.set(Calendar.WEEK_OF_MONTH,weekNumberTo);
-        while(dateSinceParsed.get(Calendar.DAY_OF_WEEK)!=2) dateSinceParsed.add(Calendar.DATE,1);
+
         StringBuilder sb = new StringBuilder();
-        for(Calendar j = dateSinceParsed;j.get(Calendar.DAY_OF_WEEK)!=7;j.add(Calendar.DATE,1)){
-            Calendar i = Calendar.getInstance();
-            for(i.set(j.get(Calendar.YEAR),j.get(Calendar.MONTH),j.get(Calendar.DAY_OF_MONTH));i.before(dateToParsed);i.add(Calendar.DATE,7)) {
-                ICurrency icurrency = null;
-                try {
-                    icurrency = loadCurrencyData(null,format.format(i.getTime()),"A/"+currency,"rates");
-                    AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) icurrency;
-                    sb.append(i.get(Calendar.DAY_OF_WEEK) +". "+makeBarChart(currencyTypeA.getFirstValue(),0.1,baseChar)+"\n");
-                } catch (IOException e) {
-                    sb.append(i.get(Calendar.DAY_OF_WEEK)+". No data \n");
+
+        StringBuilder [] days = new StringBuilder[workingDays];
+
+        for(int i=0;i<workingDays;i++){
+            days[i] = new StringBuilder();
+        }
+
+        ICurrency icurrency = null;
+
+        dateSinceParsed.add(Calendar.DATE,4);
+        dateToParsed.add(Calendar.DATE,4);
+
+        boolean flag = true;
+
+        while(!dateSinceParsed.equals(dateToParsed) && flag){
+            Calendar dateSinceAdded = Calendar.getInstance();
+            dateSinceAdded.setTime(dateSinceParsed.getTime());
+            dateSinceAdded.add(Calendar.DATE,1);
+
+            //in case we will find a date in which we dont have any data.
+
+            try
+            {
+                if(dateSinceAdded.after(dateToParsed)|| dateSinceAdded.equals(dateToParsed)){
+                    icurrency = loadCurrencyData(currency,format.format(dateSinceParsed.getTime()),"A","rates");;
+                    flag = false;
+                }
+                else{
+                    icurrency = loadCurrencyData(currency,
+                            format.format(dateSinceAdded.getTime()),"A","rates");
                 }
             }
+            catch(IOException e){
+                if(dateSinceAdded.get(Calendar.DAY_OF_WEEK)<6 && dateSinceAdded.get(Calendar.DAY_OF_WEEK)>1){
+                    days[dateSinceAdded.get(Calendar.DAY_OF_WEEK)-1].append(format.format(dateSinceAdded.getTime())+" No data \n");
+                }
+            }
+            AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) icurrency;
+            dateSinceParsed = dateSinceAdded;
+            if(currencyTypeA != null){
+                for(CurrencyObject i : currencyTypeA.currencyData){
+                    Calendar date = parseDateString(i.getDate());
+                    days[date.get(Calendar.DAY_OF_WEEK)-1].append(i.getDate()+" "+makeBarChart(i.getValueAsk(),0.1,baseChar)+"\n");
+                }
+            }
+            icurrency = null;
         }
+
+        for(int i = 0;i<workingDays;i++){
+            sb.append(days[i]);
+        }
+
         return sb.toString();
     }
 
-    public void drawFXChart(String dateSince, String dateTo, String currency){
-        ChartManager cm = new ChartManager();
-        cm.setData(dateSince,dateTo,currency);
-        cm.getChart();
+    /**
+     * Analogically to a drawWeeklyChart method it draws a graph but in graphical form.
+     * It uses javaFX and parameters are passed via scanner. Also it is a date since, date to and currency symbol.
+     */
+    public void drawFXChart() {
+        launch(new String[0]);
     }
 
+    @Override
+    public void start(Stage stage) throws Exception {
+        ChartManager cm = new ChartManager();
+        Scene scene=cm.getScene();
+        stage.setTitle("Bar Chart");
+        stage.setScene(scene);
+        stage.show();
+    }
 
 
 
@@ -255,11 +391,27 @@ public class DrivingClass{
         return gold;
     }
 
+    /**
+     * Get gold value in specific day
+     * @param day
+     * @return String with gold value
+     * @throws Exception
+     */
     public String gatherGoldData(String day) throws Exception {
         Gold object =  this.loadDayGoldData(day);
         return object.toString();
     }
 
+    /**
+     * Returns average gold price per 1g in given period. Period can be practically unlimited, but NBP api only contains information
+     * about values since 2nd of january 2013.
+     * @param dateSince Date since you want to have information in format YYYY-MM-DD
+     * @param dateTo Date to you want to have information in format YYYY-MM-DD
+     * @return String with average gold price
+     * @throws ParseException Thrown if a date is different format that YYYY-MM-DD
+     * @throws IOException Thrown if server returns 404
+     * @throws JSONException If a JSON file returned by server is in wrong format
+     */
     public String gatherAverageGoldPrice(String dateSince, String dateTo) throws IOException, JSONException, ParseException {
         if(dateSince.substring(0,7).equals(dateTo.substring(0,7))){
             Gold gold = loadDayGoldData(dateSince+"/"+dateTo);

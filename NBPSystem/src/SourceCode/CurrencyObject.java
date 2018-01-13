@@ -1,5 +1,8 @@
 package SourceCode;
 
+/**
+ * Class in which you can find all information about currency in certain day.
+ */
 public class CurrencyObject {
     public String fullName;
     public String shortName;

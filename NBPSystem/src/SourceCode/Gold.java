@@ -18,6 +18,12 @@ public class Gold{
         this.day = day;
     }
 
+    /**
+     * Method takes a String with api response and parses it into object form (GoldObjects). After that objects are added to hashset.
+     *
+     * @param apiResponse String consisting of api response
+     * @throws JSONException Thrown if apiResponse is in wrong format
+     */
     public void loadGoldRates(String apiResponse) throws JSONException {
         JSONArray jsonArray = new JSONArray(apiResponse);
         for(int i = 0;i<jsonArray.length();i++){
@@ -39,6 +45,10 @@ public class Gold{
         return this.day;
     }
 
+    /**
+     * Method sums all values that are in hashset and returns it in BigDecimal form
+     * @return BigDecimal with sum value
+     */
     public BigDecimal getSumFromPeriod(){
         BigDecimal pricesSum = new BigDecimal(0);
         for(GoldObject i : prices){

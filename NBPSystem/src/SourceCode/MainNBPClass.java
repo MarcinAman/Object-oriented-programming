@@ -1,12 +1,5 @@
 package SourceCode;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.stage.Stage;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -71,10 +64,10 @@ public class MainNBPClass{
 //            System.out.println(drivingClass.getMaxDiffrenceCurrencies("2017-12-21",10));
 //            System.out.println(drivingClass.getMaxMinOfCurrency("GBP","2013-12-15","2017-11-20"));
 //            System.out.println(drivingClass.getMaxAplitudeCurrency("2013-01-21","2017-12-23"));
-//              System.out.println(drivingClass.drawWeeklyChart("2017-10-1","2017-12-3","usd","+"));
-           drivingClass.drawFXChart("2017-10-1","2017-12-3","usd");
+//              System.out.println(drivingClass.drawWeeklyChart("2017-11-1","2017-11-3","usd","\u25A1"));
+           drivingClass.drawFXChart();
 
-            //"\u25A1"
+            //
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {

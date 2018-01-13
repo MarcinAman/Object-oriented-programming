@@ -15,6 +15,19 @@ public class AllCurrencyTypeA implements ICurrency {
         this.currencyData = new HashSet<>();
     }
 
+    /**
+     * To this method we can pass an JSON array or JSON object. It will parse it into a object form (Currency Object) and add to HashSet
+     *
+     * Be aware that Hashset does NOT keep the chronology between added elements as it uses a Hash function to define position
+     * If you want to have a chronology you might consider 2 approches:
+     * 1)Changing it to LinkedList
+     * 2)Passing a api response consisting only of 1 day
+     *
+     * As second solution is slower i suggest using it only if you have a limited time period
+     *
+     * @param apiResponse String consisting of api response
+     * @throws JSONException Thrown if apiResponse is in wrong format
+     */
     public void getAllCurrency(String apiResponse) throws JSONException {
         if(apiResponse.startsWith("[")){
             JSONArray jsonArray = new JSONArray(apiResponse);
@@ -67,6 +80,11 @@ public class AllCurrencyTypeA implements ICurrency {
     there is no way to tell which element will be returned
      */
 
+    /**
+     * Method used to get first value in currencyData.
+     * Warning: use it only if you are entirely sure that size of currencyData is exactly 1
+     * @return Double value of element
+     */
     public Double getFirstValue(){
         for(CurrencyObject i : currencyData){
             return i.getValueAsk();
@@ -74,6 +92,10 @@ public class AllCurrencyTypeA implements ICurrency {
         return null;
     }
 
+    /**
+     * Getting an CurrencyObject with maximal as price in currencyData
+     * @return CurrencyObject
+     */
     public CurrencyObject getMaxCurrencyObject(){
         CurrencyObject maxValue = null;
         for(CurrencyObject i : currencyData){
@@ -84,6 +106,10 @@ public class AllCurrencyTypeA implements ICurrency {
         return maxValue;
     }
 
+    /**
+     * Getting an CurrencyObject with minimal as price in currencyData
+     * @return CurrencyObject
+     */
     public CurrencyObject getMinCurrencyObject(){
         CurrencyObject minValue = null;
         for(CurrencyObject i : currencyData){
@@ -94,6 +120,11 @@ public class AllCurrencyTypeA implements ICurrency {
         return minValue;
     }
 
+    /**
+     * Method returns an ask value of certain currency
+     * @param currencyName String name with short symbol (3 characters long) of currency
+     * @return Double value
+     */
     public Double getCurrencyAskValue(String currencyName){
         for(CurrencyObject i : currencyData){
             if(i.getShortName().equals(currencyName)){

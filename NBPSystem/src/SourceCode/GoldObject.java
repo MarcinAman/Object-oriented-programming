@@ -2,6 +2,9 @@ package SourceCode;
 
 import java.lang.*;
 
+/**
+ * Class contains all information about certain gold value at time
+ */
 public class GoldObject {
     String date;
     Double value;
