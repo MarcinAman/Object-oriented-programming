@@ -54,7 +54,7 @@ public class ChartManager{
 
         for(int i=0;i<workingDays;i++){
             days[i] = new XYChart.Series();
-            days[i].setName(String.valueOf(i+1));
+            days[i].setName(DrivingClass.stringDays[i+1]);
         }
 
         boolean flag = true;

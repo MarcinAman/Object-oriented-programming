@@ -4,14 +4,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class AllCurrencyTypeC implements ICurrency {
-    public HashSet<CurrencyObject> currencyData;
+    public ArrayList<CurrencyObject> currencyData;
     public String date;
 
     public AllCurrencyTypeC(String date) {
-        this.currencyData = new HashSet<>();
+        this.currencyData = new ArrayList<>();
         this.date = date;
     }
 

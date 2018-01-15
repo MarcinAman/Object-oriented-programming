@@ -4,26 +4,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class AllCurrencyTypeA implements ICurrency {
-    public HashSet<CurrencyObject>currencyData;
+    public ArrayList<CurrencyObject> currencyData;
     String date;
 
     public AllCurrencyTypeA(String date){
         this.date = date;
-        this.currencyData = new HashSet<>();
+        this.currencyData = new ArrayList<>();
     }
 
     /**
-     * To this method we can pass an JSON array or JSON object. It will parse it into a object form (Currency Object) and add to HashSet
-     *
-     * Be aware that Hashset does NOT keep the chronology between added elements as it uses a Hash function to define position
-     * If you want to have a chronology you might consider 2 approches:
-     * 1)Changing it to LinkedList
-     * 2)Passing a api response consisting only of 1 day
-     *
-     * As second solution is slower i suggest using it only if you have a limited time period
+     * To this method we can pass an JSON array or JSON object. It will parse it into a object form (Currency Object) and add to ArrayList
      *
      * @param apiResponse String consisting of api response
      * @throws JSONException Thrown if apiResponse is in wrong format

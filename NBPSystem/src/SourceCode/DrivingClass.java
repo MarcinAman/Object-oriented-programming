@@ -25,6 +25,7 @@ public class DrivingClass extends Application{
     private static int valueLength = 20;
     public SimpleDateFormat format;
     private static int workingDays = 7;
+    public static String [] stringDays = {null,null,"MON","TUE","WED","THU","FRI",null};
 
     public DrivingClass (){
         format = new SimpleDateFormat("yyyy-MM-dd");
@@ -54,6 +55,9 @@ public class DrivingClass extends Application{
         }
         input.close();
         if(api.toString().startsWith("404")) throw new IOException("Data not found");
+//        if(!api.toString().startsWith("[") && !api.toString().startsWith("{")){
+//            return getAllData(URLs);
+//        }
         return api.toString();
     }
 
@@ -304,9 +308,9 @@ public class DrivingClass extends Application{
         String monthDateTo = dateTo.substring(0,dateTo.lastIndexOf("-"))+"-01";
         int weekNumberTo = Integer.parseInt(dateTo.substring(dateTo.lastIndexOf("-")+1,dateTo.length()));
         Calendar dateSinceParsed = parseDateString(monthDateSince);
-        dateSinceParsed.set(Calendar.WEEK_OF_MONTH,weekNumberSince-1);
+        dateSinceParsed.set(Calendar.WEEK_OF_MONTH,weekNumberSince);
         Calendar dateToParsed = parseDateString(monthDateTo);
-        dateToParsed.set(Calendar.WEEK_OF_MONTH,weekNumberTo);
+        dateToParsed.set(Calendar.WEEK_OF_MONTH,weekNumberTo+1);
 
         StringBuilder sb = new StringBuilder();
 
@@ -316,45 +320,47 @@ public class DrivingClass extends Application{
             days[i] = new StringBuilder();
         }
 
-        ICurrency icurrency = null;
-
-        dateSinceParsed.add(Calendar.DATE,4);
-        dateToParsed.add(Calendar.DATE,4);
+//        dateSinceParsed.add(Calendar.DATE,3);
+//        dateToParsed.add(Calendar.DATE,4);
 
         boolean flag = true;
 
         while(!dateSinceParsed.equals(dateToParsed) && flag){
+            ICurrency icurrency = null;
             Calendar dateSinceAdded = Calendar.getInstance();
             dateSinceAdded.setTime(dateSinceParsed.getTime());
-            dateSinceAdded.add(Calendar.DATE,1);
+            dateSinceAdded.add(Calendar.DATE,7);
 
             //in case we will find a date in which we dont have any data.
 
-            try
-            {
+            try{
                 if(dateSinceAdded.after(dateToParsed)|| dateSinceAdded.equals(dateToParsed)){
-                    icurrency = loadCurrencyData(currency,format.format(dateSinceParsed.getTime()),"A","rates");;
+                    icurrency = loadCurrencyData(currency,format.format(dateSinceParsed.getTime())+"/"+format.format(dateToParsed.getTime()),"A","rates");
                     flag = false;
                 }
                 else{
                     icurrency = loadCurrencyData(currency,
-                            format.format(dateSinceAdded.getTime()),"A","rates");
+                            format.format(dateSinceParsed.getTime())+"/"+format.format(dateSinceAdded.getTime()),"A","rates");
                 }
             }
-            catch(IOException e){
-                if(dateSinceAdded.get(Calendar.DAY_OF_WEEK)<6 && dateSinceAdded.get(Calendar.DAY_OF_WEEK)>1){
-                    days[dateSinceAdded.get(Calendar.DAY_OF_WEEK)-1].append(format.format(dateSinceAdded.getTime())+" No data \n");
-                }
+            catch( IOException e){
+//                Calendar fin;
+//                if(flag) fin = dateSinceAdded;
+//                else fin = dateToParsed;
+//                for(Calendar i = dateSinceParsed;i.before(fin);i.add(Calendar.DATE,1)){
+//                    days[i.get(Calendar.DAY_OF_WEEK)-1].append(format.format(i.getTime())+" No data");
+//                }
+                //If you want to have information about dates that doesnt have any data untag this^
             }
             AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) icurrency;
             dateSinceParsed = dateSinceAdded;
+            dateSinceParsed.add(Calendar.DATE,1);
             if(currencyTypeA != null){
                 for(CurrencyObject i : currencyTypeA.currencyData){
                     Calendar date = parseDateString(i.getDate());
-                    days[date.get(Calendar.DAY_OF_WEEK)-1].append(i.getDate()+" "+makeBarChart(i.getValueAsk(),0.1,baseChar)+"\n");
+                    days[date.get(Calendar.DAY_OF_WEEK)-1].append(i.getDate()+" "+stringDays[date.get(Calendar.DAY_OF_WEEK)]+" "+makeBarChart(i.getValueAsk(),0.1,baseChar)+"\n");
                 }
             }
-            icurrency = null;
         }
 
         for(int i = 0;i<workingDays;i++){

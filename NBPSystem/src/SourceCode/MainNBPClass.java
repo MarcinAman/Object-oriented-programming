@@ -64,8 +64,8 @@ public class MainNBPClass{
 //            System.out.println(drivingClass.getMaxDiffrenceCurrencies("2017-12-21",10));
 //            System.out.println(drivingClass.getMaxMinOfCurrency("GBP","2013-12-15","2017-11-20"));
 //            System.out.println(drivingClass.getMaxAplitudeCurrency("2013-01-21","2017-12-23"));
-//              System.out.println(drivingClass.drawWeeklyChart("2017-11-1","2017-11-3","usd","\u25A1"));
-           drivingClass.drawFXChart();
+//            System.out.println(drivingClass.drawWeeklyChart("2017-12-1","2018-01-2","usd","\u25A1"));
+//           drivingClass.drawFXChart();
 
             //
         } catch (IOException e) {

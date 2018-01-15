@@ -6,15 +6,16 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 
 public class Gold{
-    public HashSet<GoldObject> prices;
+    public ArrayList<GoldObject> prices;
     public String day;
 
     public Gold(String day){
-        this.prices = new HashSet<>();
+        this.prices = new ArrayList<>();
         this.day = day;
     }
 
