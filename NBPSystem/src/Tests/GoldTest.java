@@ -3,6 +3,7 @@ package Tests;
 import SourceCode.DrivingClass;
 import SourceCode.Gold;
 import SourceCode.GoldObject;
+import SourceCode.Loader;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class GoldTest {
     @org.junit.Test
     public void loadGoldRates() throws IOException, JSONException {
         DrivingClass dr = new DrivingClass();
-        String apiResponse = dr.getAllData("http://api.nbp.pl/api/cenyzlota/2017-01-02/?format=json");
+        String apiResponse = Loader.getAllData("http://api.nbp.pl/api/cenyzlota/2017-01-02/?format=json");
         Gold gold = new Gold("2017-01-02");
         gold.loadGoldRates(apiResponse);
 

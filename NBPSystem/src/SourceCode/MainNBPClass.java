@@ -24,38 +24,42 @@ public class MainNBPClass{
     public static void main(String [] args){
        DrivingClass drivingClass = new DrivingClass();
        try {
-//            if(args.length == 0 || args[0].equals("--help")){
-//                displayHelp();
-//            }
-//            else{
-//                if(args[0].equals("dayCurrency")){
-//                    System.out.println(drivingClass.gatherDayCurrencyDataTableA(args[1],args[2]));
-//                }
-//                else if(args[0].equals("dayGold")){
-//                    System.out.println(drivingClass.gatherGoldData(args[1]));
-//                }
-//                else if(args[0].equals("avgGold")){
-//                    System.out.println(drivingClass.gatherAverageGoldPrice(args[1],args[2]));
-//                }
-//                else if(args[0].equals("minCurrency")){
-//                    System.out.println(drivingClass.getMinAskCurrency(args[1]));
-//                }
-//                else if(args[0].equals("maxDiffCurrency")){
-//                    System.out.println(drivingClass.getMaxDiffrenceCurrencies(args[1],Integer.parseInt(args[2])));
-//                }
-//                else if(args[0].equals("maxMinOf")){
-//                    System.out.println(drivingClass.getMaxMinOfCurrency(args[1],args[2],args[3]));
-//                }
-//                else if(args[0].equals("maxAmplitudeCur")){
-//                    System.out.println(drivingClass.getMaxAplitudeCurrency(args[1],args[2]));
-//                }
-//                else if(args[0].equals("drawWeeklyChart")){
-//                    System.out.print(drivingClass.drawWeeklyChart(args[1],args[2],args[3],args[4].charAt(0)));
-//                }else{
-//                    displayHelp();
-//                }
-//            }
-            System.out.println(drivingClass.gatherDayCurrencyDataTableA("GBP","2015-12-15"));
+            if(args.length == 0 || args[0].equals("--help")){
+                displayHelp();
+            }
+            else{
+                if(args[0].equals("dayCurrency") && args.length>0){
+                    System.out.println(drivingClass.gatherDayCurrencyDataTableA(args[1],args[2]));
+                }
+                else if(args[0].equals("dayGold") && args.length==2){
+                    System.out.println(drivingClass.gatherGoldData(args[1]));
+                }
+                else if(args[0].equals("avgGold") && args.length == 3){
+                    System.out.println(drivingClass.gatherAverageGoldPrice(args[1],args[2]));
+                }
+                else if(args[0].equals("minCurrency")&& args.length == 2){
+                    System.out.println(drivingClass.getMinAskCurrency(args[1]));
+                }
+                else if(args[0].equals("maxDiffCurrency") && args.length == 3){
+                    System.out.println(drivingClass.getMaxDiffrenceCurrencies(args[1],Integer.parseInt(args[2])));
+                }
+                else if(args[0].equals("maxMinOf") && args.length == 4){
+                    System.out.println(drivingClass.getMaxMinOfCurrency(args[1],args[2],args[3]));
+                }
+                else if(args[0].equals("maxAmplitudeCur") && args.length == 3){
+                    System.out.println(drivingClass.getMaxAplitudeCurrency(args[1],args[2]));
+                }
+                else if(args[0].equals("drawWeeklyChart") && args.length == 5){
+                    System.out.print(drivingClass.drawWeeklyChart(args[1],args[2],args[3],args[4]));
+                }
+                else if(args[0].equals("drawFXChart") && args.length == 0){
+                    drivingClass.drawFXChart();
+                }
+                else{
+                    displayHelp();
+                }
+            }
+//            System.out.println(drivingClass.gatherDayCurrencyDataTableA("GBP","2015-12-15"));
 //            System.out.println(drivingClass.gatherDayCurrencyDataTableA("USD","2016-05-04"));
 //            System.out.println(drivingClass.gatherDayCurrencyDataTableA("USD","2017-04-04"));
 //            System.out.println(drivingClass.gatherGoldData("2017-12-15"));
@@ -77,8 +81,3 @@ public class MainNBPClass{
         }
     }
 }
-
-//http://www.jfree.org/jfreechart/download.html
-//https://stackoverflow.com/questions/16714738/xy-plotting-with-java
-//Testy automatyczne
-//Java FX

@@ -71,11 +71,11 @@ public class ChartManager{
             try
             {
                 if(dateSinceAdded.after(dateToParsed)|| dateSinceAdded.equals(dateToParsed)){
-                    icurrency = dr.loadCurrencyData(currency,dr.format.format(dateSinceParsed.getTime()),"A","rates");;
+                    icurrency = Loader.loadCurrencyData(currency,dr.format.format(dateSinceParsed.getTime()),"A","rates");;
                     flag = false;
                 }
                 else{
-                    icurrency = dr.loadCurrencyData(currency,
+                    icurrency = Loader.loadCurrencyData(currency,
                             dr.format.format(dateSinceAdded.getTime()),"A","rates");
                 }
             }

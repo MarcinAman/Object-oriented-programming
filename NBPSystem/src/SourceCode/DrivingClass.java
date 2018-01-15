@@ -31,66 +31,8 @@ public class DrivingClass extends Application{
         format = new SimpleDateFormat("yyyy-MM-dd");
     }
 
-
-    //Common part:
-
-    /**
-     * Method is responsible for sending requests to a api server.
-     * String value of the api response is being returned
-     * after that connection to a server is closed
-     *
-     * @param URLs url connection
-     * @return String value of api response
-     * @throws IOException Thrown if server response is "404"
-     */
-
-    public String getAllData(String URLs) throws IOException {
-        URL url = new URL(URLs);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-        BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputString;
-        StringBuilder api = new StringBuilder();
-        while((inputString=input.readLine())!=null){
-            api.append(inputString);
-        }
-        input.close();
-        if(api.toString().startsWith("404")) throw new IOException("Data not found");
-//        if(!api.toString().startsWith("[") && !api.toString().startsWith("{")){
-//            return getAllData(URLs);
-//        }
-        return api.toString();
-    }
-
     //Currency part:
 
-    /**
-     * Method loading a string parameters info an URL-String form and then parse it into objects
-     * Possible return objects are: AllCurrencyTypeA or AllCurrencyTypeC as they implement ICurrency interface
-     * @param name Name of currency that we search for
-     * @param date Date or a time period in format date1/date2 or just date1
-     * @param table Table to search. Can be either A or C
-     * @param column In which we search. To exacly know which you want see certain api return methods
-     * @return ICurrency Object with data
-     * @throws IOException Thrown if server returns 404
-     * @throws JSONException If a JSON file returned by server is in wrong format
-     */
-    public ICurrency loadCurrencyData(String name, String date,String table,String column) throws IOException, JSONException {
-        ICurrency currency = null;
-        if(table.equals("A")||table.startsWith("A")){
-            currency =  new AllCurrencyTypeA(date);
-        }
-        else{
-            currency =  new AllCurrencyTypeC(date);
-        }
-        if(name==null){
-            currency.getAllCurrency(getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+date+"/?format=json"));
-        }
-        else{
-            currency.getAllCurrency(getAllData("http://api.nbp.pl/api/exchangerates/"+column+"/"+table+"/"+name+"/"+date+"/?format=json"));
-
-        }
-        return currency;
-    }
 
     /**
      * Pass-through method to make your life easier. You don't need to remember the table or column.
@@ -104,14 +46,9 @@ public class DrivingClass extends Application{
      */
 
     public String gatherDayCurrencyDataTableA(String currencyName,String day) throws IOException, JSONException {
-        ICurrency object = loadCurrencyData(currencyName,day,"A","rates");
+        ICurrency object = Loader.loadCurrencyData(currencyName,day,"A","rates");
         AllCurrencyTypeA currencyTypeA = (AllCurrencyTypeA) object;
         return "Currency value: " + currencyTypeA.toString();
-    }
-
-    public ICurrency loadDayCurrencyDataTableC(String day) throws IOException, JSONException {
-        ICurrency currency = loadCurrencyData(null,day,"C","tables");
-        return currency;
     }
 
     /**
@@ -122,10 +59,10 @@ public class DrivingClass extends Application{
      * @throws JSONException If a JSON file returned by server is in wrong format
      */
     public String getMinAskCurrency(String day) throws IOException, JSONException {
-        ICurrency object = loadDayCurrencyDataTableC(day);
+        ICurrency object = Loader.loadDayCurrencyDataTableC(day);
         AllCurrencyTypeC currencyTypeC = (AllCurrencyTypeC) object;
         CurrencyObject result = currencyTypeC.getMinCurrencyObject();
-        return "Minimal ask currency object is: " + result.toString();
+        return "Minimal ask currency object is: " + result.toString()+"\n";
     }
 
     /**
@@ -137,7 +74,7 @@ public class DrivingClass extends Application{
      * @throws JSONException If a JSON file returned by server is in wrong format
      */
     public String getMaxDiffrenceCurrencies(String day, int amount) throws IOException, JSONException {
-        ICurrency iCurrency = loadDayCurrencyDataTableC(day);
+        ICurrency iCurrency = Loader.loadDayCurrencyDataTableC(day);
         AllCurrencyTypeC object = (AllCurrencyTypeC)iCurrency;
         StringBuilder sb = new StringBuilder();
         if(amount>=object.currencyData.size()){
@@ -183,13 +120,13 @@ public class DrivingClass extends Application{
             dateSinceAdded.setTime(dateSinceParsed.getTime());
             dateSinceAdded.add(Calendar.DATE,180);
             if(dateSinceAdded.after(dateToParsed)||dateSinceAdded.equals(dateToParsed)){
-                ICurrency iCurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+"/"+dateTo,
+                ICurrency iCurrency = Loader.loadCurrencyData(null,format.format(dateSinceParsed.getTime())+"/"+dateTo,
                         "A/"+currency,"rates");
                 currencyTypeA = (AllCurrencyTypeA) iCurrency;
                 flag = false;
             }
             else{
-                ICurrency iCurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+"/"+
+                ICurrency iCurrency = Loader.loadCurrencyData(null,format.format(dateSinceParsed.getTime())+"/"+
                         format.format(dateSinceAdded.getTime()),
                         "A/"+currency,"rates");
                 currencyTypeA = (AllCurrencyTypeA) iCurrency;
@@ -207,7 +144,7 @@ public class DrivingClass extends Application{
         }
 
         return "Min value: " + minValue.toStringWithDate() + "\n" +
-                "Max value: " +maxValue.toStringWithDate();
+                "Max value: " +maxValue.toStringWithDate()+"\n";
     }
 
     /**
@@ -235,16 +172,17 @@ public class DrivingClass extends Application{
             dateSinceAdded.setTime(dateSinceParsed.getTime());
             dateSinceAdded.add(Calendar.DATE,90);
             if(dateSinceAdded.after(dateToParsed) || dateSinceAdded.equals(dateToParsed)){
-                ICurrency icurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+
+                ICurrency icurrency = Loader.loadCurrencyData(null,format.format(dateSinceParsed.getTime())+
                         "/"+dateTo,"A","tables");
                 currencyTypeA = (AllCurrencyTypeA) icurrency;
                 flag = false;
             }
             else{
-                ICurrency icurrency = loadCurrencyData(null,format.format(dateSinceParsed.getTime())+
+                ICurrency icurrency = Loader.loadCurrencyData(null,format.format(dateSinceParsed.getTime())+
                         "/"+format.format(dateSinceAdded.getTime()),"A","tables");
                 currencyTypeA = (AllCurrencyTypeA) icurrency;
                 dateSinceParsed = dateSinceAdded;
+                dateSinceParsed.add(Calendar.DATE,1);
             }
 
             for(CurrencyObject j : currencyTypeA.currencyData){
@@ -264,15 +202,15 @@ public class DrivingClass extends Application{
                 }
             }
         }
-        Double maxValue = null;
+        double maxValue = 0;
         CurrencyObject maxCurrency = null;
         for(Map.Entry<CurrencyObject,Double> i : amplitudes.entrySet()){
-            if(maxValue==null || maxValue.compareTo(i.getValue())==0){
+            if(maxValue==0 || maxValue < i.getValue()){
                 maxValue = i.getValue();
                 maxCurrency = i.getKey();
             }
         }
-        return "Max amplitude has currency: " + maxCurrency.getFullName() + " with: " + maxValue;
+        return "Max amplitude has currency: " + maxCurrency.getFullName() + " with: " + String.format("%.2f", maxValue) + "\n";
     }
 
     public Calendar parseDateString(String date) throws ParseException {
@@ -335,11 +273,11 @@ public class DrivingClass extends Application{
 
             try{
                 if(dateSinceAdded.after(dateToParsed)|| dateSinceAdded.equals(dateToParsed)){
-                    icurrency = loadCurrencyData(currency,format.format(dateSinceParsed.getTime())+"/"+format.format(dateToParsed.getTime()),"A","rates");
+                    icurrency = Loader.loadCurrencyData(currency,format.format(dateSinceParsed.getTime())+"/"+format.format(dateToParsed.getTime()),"A","rates");
                     flag = false;
                 }
                 else{
-                    icurrency = loadCurrencyData(currency,
+                    icurrency = Loader.loadCurrencyData(currency,
                             format.format(dateSinceParsed.getTime())+"/"+format.format(dateSinceAdded.getTime()),"A","rates");
                 }
             }
@@ -391,11 +329,6 @@ public class DrivingClass extends Application{
 
     //SourceCode.Gold Part:
 
-    public Gold loadDayGoldData(String day) throws IOException, JSONException {
-        Gold gold = new Gold(day);
-        gold.loadGoldRates(getAllData("http://api.nbp.pl/api/cenyzlota/"+day+"/?format=json"));
-        return gold;
-    }
 
     /**
      * Get gold value in specific day
@@ -404,7 +337,7 @@ public class DrivingClass extends Application{
      * @throws Exception
      */
     public String gatherGoldData(String day) throws Exception {
-        Gold object =  this.loadDayGoldData(day);
+        Gold object =  Loader.loadDayGoldData(day);
         return object.toString();
     }
 
@@ -420,7 +353,7 @@ public class DrivingClass extends Application{
      */
     public String gatherAverageGoldPrice(String dateSince, String dateTo) throws IOException, JSONException, ParseException {
         if(dateSince.substring(0,7).equals(dateTo.substring(0,7))){
-            Gold gold = loadDayGoldData(dateSince+"/"+dateTo);
+            Gold gold = Loader.loadDayGoldData(dateSince+"/"+dateTo);
             return "Avg gold price in period: " + dateSince +" to " + dateTo + " is "+gold.getAvgFromPeriod();
         }
         else{
@@ -434,13 +367,13 @@ public class DrivingClass extends Application{
                 dateSinceAdded.setTime(dateSinceParsed.getTime());
                 dateSinceAdded.add(Calendar.DATE,50);
                 if(dateSinceAdded.after(dateToParsed) || dateSinceAdded.equals(dateToParsed)){
-                    Gold gold = loadDayGoldData(format.format(dateSinceParsed.getTime())+"/"+dateTo);
+                    Gold gold = Loader.loadDayGoldData(format.format(dateSinceParsed.getTime())+"/"+dateTo);
                     sum = sum.add(gold.getSumFromPeriod());
                     days = days.add(gold.getDaysAmount());
                     break;
                 }
                 else{
-                    Gold gold = loadDayGoldData(format.format(dateSinceParsed.getTime())+"/"+
+                    Gold gold = Loader.loadDayGoldData(format.format(dateSinceParsed.getTime())+"/"+
                     format.format(dateSinceAdded.getTime()));
                     sum = sum.add(gold.getSumFromPeriod());
                     days = days.add(gold.getDaysAmount());
@@ -448,7 +381,7 @@ public class DrivingClass extends Application{
                 }
             }
             BigDecimal result = sum.divide(days,2, RoundingMode.HALF_EVEN);
-            return "Avg gold price in period: " + dateSince +" to " + dateTo + " is "+result;
+            return "Avg gold price in period: " + dateSince +" to " + dateTo + " is "+result+"\n";
         }
     }
 
